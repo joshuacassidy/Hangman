@@ -28,21 +28,23 @@ public class Hangman {
             while(!(word.toString().equalsIgnoreCase(secretWord)) && guessCounter <= lives){
                 System.out.printf("You have %d lives left\n",lives-guessCounter);
                 System.out.println("Guess a letter!");
+                try{
+                    char input = scanner.nextLine().charAt(0);
+                    for(int i = 0; i < secretWord.length(); i++){
+                        word.setCharAt(i,input == secretWord.charAt(i) ? input : word.charAt(i));
+                    }
+                    System.out.print("\033[H\033[2J");
 
-                char input = scanner.nextLine().charAt(0);
-                for(int i = 0; i < secretWord.length(); i++){
-                    word.setCharAt(i,input == secretWord.charAt(i) ? input : word.charAt(i));
+                    if(!lettersGuessed.toString().contains(Character.toString(input))){
+                        lettersGuessed.append(String.format("%s ",input));
+                        guessCounter = secretWord.contains(Character.toString(input))  ? guessCounter : guessCounter+1;
+                    } else{
+                        System.out.println("You have already guessed that letter!");
+                    }
+                    System.out.printf("The letters guessed are: %s \n%s\n",lettersGuessed,word);
+                } catch (IndexOutOfBoundsException e){
+                    System.out.println("Error: You must make a guess!");
                 }
-                System.out.print("\033[H\033[2J");
-
-            if(!lettersGuessed.toString().contains(Character.toString(input))){
-                lettersGuessed.append(String.format("%s ",input));
-                guessCounter = secretWord.contains(Character.toString(input))  ? guessCounter : guessCounter+1;
-            } else{
-                System.out.println("You have already guessed that letter!");
-            }
-
-                System.out.printf("The letters guessed are: %s \n%s\n",lettersGuessed,word);
             }
             System.out.println(!(word.toString().equalsIgnoreCase(secretWord)) || lives == guessCounter ? "You lose" : "You win");
             playAgain();
@@ -71,8 +73,10 @@ public class Hangman {
     }
     
     public void newGame(){
-        System.out.println("Choose a new word to play hangman with.");
-        secretWord = scanner.nextLine().toLowerCase();
+        do{
+            System.out.println("Choose a new word to play hangman with.(The word must be atleast 1 character long)");
+            secretWord = scanner.nextLine().toLowerCase();
+        } while (secretWord.length() == 0);
         word.setLength(0);
         guessCounter = 0;
         lettersGuessed.setLength(0);
